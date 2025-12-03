@@ -24,7 +24,8 @@ final class TransactionTests: XCTestCase {
             modelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
             modelContext = ModelContext(modelContainer)
         } catch {
-            fatalError("Could not create ModelContainer for testing: \(error)")
+            XCTFail("Could not create ModelContainer for testing: \(error)")
+            return
         }
     }
     
