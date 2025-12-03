@@ -27,14 +27,6 @@ jobs:
     - name: Show available simulators
       run: xcrun simctl list devices available
     
-    - name: Cache Swift Package Manager
-      uses: actions/cache@v3
-      with:
-        path: .build
-        key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
-        restore-keys: |
-          ${{ runner.os }}-spm-
-    
     # Note: This workflow assumes an Xcode project/workspace exists
     # If the project structure changes, update the build/test commands accordingly
     

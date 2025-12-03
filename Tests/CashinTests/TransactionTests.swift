@@ -46,8 +46,8 @@ final class TransactionTests: XCTestCase {
         // Act
         let transaction = Transaction(
             amount: amount,
-            type: type,
             category: category,
+            type: type,
             date: date
         )
         
@@ -62,8 +62,8 @@ final class TransactionTests: XCTestCase {
         // Arrange
         let transaction = Transaction(
             amount: 50.0,
-            type: .expense,
             category: "Food",
+            type: .expense,
             date: Date()
         )
         
@@ -89,8 +89,8 @@ final class TransactionTests: XCTestCase {
         // Arrange & Act
         let transaction = Transaction(
             amount: 100.0,
-            type: .income,
             category: "Freelance",
+            type: .income,
             date: Date()
         )
         
@@ -102,8 +102,8 @@ final class TransactionTests: XCTestCase {
         // Arrange & Act
         let transaction = Transaction(
             amount: 75.0,
-            type: .expense,
             category: "Transport",
+            type: .expense,
             date: Date()
         )
         
@@ -117,8 +117,8 @@ final class TransactionTests: XCTestCase {
         // Arrange
         let transaction = Transaction(
             amount: 30.0,
-            type: .income,
             category: "Bonus",
+            type: .income,
             date: Date()
         )
         modelContext.insert(transaction)
@@ -143,10 +143,10 @@ final class TransactionTests: XCTestCase {
     
     func testMultipleTransactions_calculation_isCorrect() {
         // Arrange
-        let income1 = Transaction(amount: 100.0, type: .income, category: "Work", date: Date())
-        let income2 = Transaction(amount: 50.0, type: .income, category: "Freelance", date: Date())
-        let expense1 = Transaction(amount: 30.0, type: .expense, category: "Food", date: Date())
-        let expense2 = Transaction(amount: 20.0, type: .expense, category: "Transport", date: Date())
+        let income1 = Transaction(amount: 100.0, category: "Work", type: .income, date: Date())
+        let income2 = Transaction(amount: 50.0, category: "Freelance", type: .income, date: Date())
+        let expense1 = Transaction(amount: 30.0, category: "Food", type: .expense, date: Date())
+        let expense2 = Transaction(amount: 20.0, category: "Transport", type: .expense, date: Date())
         
         modelContext.insert(income1)
         modelContext.insert(income2)

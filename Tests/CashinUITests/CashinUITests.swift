@@ -57,11 +57,9 @@ final class CashinUITests: XCTestCase {
         if quickAddButton10.exists {
             quickAddButton10.tap()
             
-            // Wait a moment for the UI to update
-            sleep(1)
-            
-            // Verify a transaction was added (implementation-dependent)
-            // This would check for transaction rows or updated balance
+            // Wait for the UI to update using proper expectation
+            let transactionAdded = app.staticTexts.containing(NSPredicate(format: "label CONTAINS '10'")).firstMatch
+            XCTAssertTrue(transactionAdded.waitForExistence(timeout: 3), "Transaction should appear in the UI")
         }
     }
     
@@ -158,10 +156,11 @@ final class CashinUITests: XCTestCase {
         let quickAddButton10 = app.buttons["quickAdd10"]
         if quickAddButton10.exists {
             quickAddButton10.tap()
-            sleep(1)
             
-            // Find a transaction row
+            // Wait for transaction to appear
             let transactionRow = app.tables.cells.element(boundBy: 0)
+            XCTAssertTrue(transactionRow.waitForExistence(timeout: 3), "Transaction row should appear")
+            
             if transactionRow.exists {
                 // Swipe left to reveal delete button
                 transactionRow.swipeLeft()
