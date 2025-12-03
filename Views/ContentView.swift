@@ -16,6 +16,7 @@ struct ContentView: View {
     
     @State private var showingAddTransaction = false
     @State private var showingHistory = false
+    @State private var showingEarnings = false
     
     var body: some View {
         ZStack {
@@ -131,6 +132,23 @@ struct ContentView: View {
                     .foregroundStyle(.white)
                     .accessibilityLabel("View history")
                     
+                    Button(action: { showingEarnings = true }) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "dollarsign.circle.fill")
+                                .font(.system(size: 20))
+                            Text("Earnings")
+                                .fontWeight(.semibold)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 18)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color(red: 0.15, green: 0.15, blue: 0.16))
+                        )
+                    }
+                    .foregroundStyle(.white)
+                    .accessibilityLabel("View earnings")
+                    
                     Button(action: { showingAddTransaction = true }) {
                         HStack(spacing: 8) {
                             Image(systemName: "plus.circle.fill")
@@ -158,6 +176,9 @@ struct ContentView: View {
         }
         .sheet(isPresented: $showingHistory) {
             HistoryView()
+        }
+        .sheet(isPresented: $showingEarnings) {
+            EarningsView()
         }
         .onAppear {
             performDayReset()
