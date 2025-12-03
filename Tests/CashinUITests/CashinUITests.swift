@@ -177,8 +177,11 @@ final class CashinUITests: XCTestCase {
     // MARK: - Performance Tests
     
     func testAppLaunchPerformance() throws {
+        // Measure app launch performance using the configured app instance
+        app.terminate()
+        
         measure(metrics: [XCTApplicationLaunchMetric()]) {
-            XCUIApplication().launch()
+            app.launch()
         }
     }
 }
