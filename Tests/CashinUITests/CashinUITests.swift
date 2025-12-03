@@ -51,14 +51,14 @@ final class CashinUITests: XCTestCase {
     }
     
     func testQuickAddButton_tap_addsTransaction() throws {
-        // Get initial transaction count (if available)
         // Tap a quick-add button
         let quickAddButton10 = app.buttons["quickAdd10"]
         if quickAddButton10.exists {
             quickAddButton10.tap()
             
             // Wait for the UI to update using proper expectation
-            let transactionAdded = app.staticTexts.containing(NSPredicate(format: "label CONTAINS '10'")).firstMatch
+            // Look for any element containing transaction information
+            let transactionAdded = app.staticTexts.containing(NSPredicate(format: "label CONTAINS '$10'")).firstMatch
             XCTAssertTrue(transactionAdded.waitForExistence(timeout: 3), "Transaction should appear in the UI")
         }
     }
@@ -123,10 +123,9 @@ final class CashinUITests: XCTestCase {
             // Verify history view appears
             XCTAssertTrue(app.navigationBars["History"].waitForExistence(timeout: 2), "History view should appear")
             
-            // Navigate back
-            let backButton = app.navigationBars.buttons.element(boundBy: 0)
-            if backButton.exists {
-                backButton.tap()
+            // Navigate back using a more specific approach
+            if app.navigationBars.buttons.firstMatch.exists {
+                app.navigationBars.buttons.firstMatch.tap()
             }
         }
     }
@@ -141,10 +140,9 @@ final class CashinUITests: XCTestCase {
             let chartView = app.otherElements["7DayChart"]
             XCTAssertTrue(chartView.waitForExistence(timeout: 3), "7-day chart should be displayed")
             
-            // Navigate back
-            let backButton = app.navigationBars.buttons.element(boundBy: 0)
-            if backButton.exists {
-                backButton.tap()
+            // Navigate back using a more specific approach
+            if app.navigationBars.buttons.firstMatch.exists {
+                app.navigationBars.buttons.firstMatch.tap()
             }
         }
     }

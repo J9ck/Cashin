@@ -12,10 +12,13 @@ final class DateExtensionsTests: XCTestCase {
     
     // MARK: - Start of Day Tests
     
-    func testStartOfDay_returnsCorrectDate() {
+    func testStartOfDay_returnsCorrectDate() throws {
         // Arrange
         let calendar = Calendar.current
-        let date = calendar.date(from: DateComponents(year: 2025, month: 12, day: 3, hour: 14, minute: 30))!
+        guard let date = calendar.date(from: DateComponents(year: 2025, month: 12, day: 3, hour: 14, minute: 30)) else {
+            XCTFail("Failed to create test date")
+            return
+        }
         
         // Act
         let startOfDay = calendar.startOfDay(for: date)
@@ -43,9 +46,12 @@ final class DateExtensionsTests: XCTestCase {
         XCTAssertTrue(result, "Today's date should be recognized as today")
     }
     
-    func testIsToday_withYesterdaysDate_returnsFalse() {
+    func testIsToday_withYesterdaysDate_returnsFalse() throws {
         // Arrange
-        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+        guard let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date()) else {
+            XCTFail("Failed to create yesterday's date")
+            return
+        }
         
         // Act
         let result = Calendar.current.isDateInToday(yesterday)
@@ -54,9 +60,12 @@ final class DateExtensionsTests: XCTestCase {
         XCTAssertFalse(result, "Yesterday's date should not be recognized as today")
     }
     
-    func testIsYesterday_withYesterdaysDate_returnsTrue() {
+    func testIsYesterday_withYesterdaysDate_returnsTrue() throws {
         // Arrange
-        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+        guard let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date()) else {
+            XCTFail("Failed to create yesterday's date")
+            return
+        }
         
         // Act
         let result = Calendar.current.isDateInYesterday(yesterday)
@@ -67,13 +76,19 @@ final class DateExtensionsTests: XCTestCase {
     
     // MARK: - Date Addition Tests
     
-    func testAddingDays_toDate_returnsCorrectDate() {
+    func testAddingDays_toDate_returnsCorrectDate() throws {
         // Arrange
         let calendar = Calendar.current
-        let startDate = calendar.date(from: DateComponents(year: 2025, month: 12, day: 1))!
+        guard let startDate = calendar.date(from: DateComponents(year: 2025, month: 12, day: 1)) else {
+            XCTFail("Failed to create start date")
+            return
+        }
         
         // Act
-        let resultDate = calendar.date(byAdding: .day, value: 7, to: startDate)!
+        guard let resultDate = calendar.date(byAdding: .day, value: 7, to: startDate) else {
+            XCTFail("Failed to add days to date")
+            return
+        }
         let components = calendar.dateComponents([.year, .month, .day], from: resultDate)
         
         // Assert
@@ -84,10 +99,13 @@ final class DateExtensionsTests: XCTestCase {
     
     // MARK: - Date Formatting Tests
     
-    func testDateFormatting_withStandardFormat_returnsCorrectString() {
+    func testDateFormatting_withStandardFormat_returnsCorrectString() throws {
         // Arrange
         let calendar = Calendar.current
-        let date = calendar.date(from: DateComponents(year: 2025, month: 12, day: 3))!
+        guard let date = calendar.date(from: DateComponents(year: 2025, month: 12, day: 3)) else {
+            XCTFail("Failed to create test date")
+            return
+        }
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         
@@ -100,11 +118,14 @@ final class DateExtensionsTests: XCTestCase {
     
     // MARK: - Days Between Tests
     
-    func testDaysBetween_twoDates_returnsCorrectDifference() {
+    func testDaysBetween_twoDates_returnsCorrectDifference() throws {
         // Arrange
         let calendar = Calendar.current
-        let startDate = calendar.date(from: DateComponents(year: 2025, month: 12, day: 1))!
-        let endDate = calendar.date(from: DateComponents(year: 2025, month: 12, day: 8))!
+        guard let startDate = calendar.date(from: DateComponents(year: 2025, month: 12, day: 1)),
+              let endDate = calendar.date(from: DateComponents(year: 2025, month: 12, day: 8)) else {
+            XCTFail("Failed to create test dates")
+            return
+        }
         
         // Act
         let days = calendar.dateComponents([.day], from: startDate, to: endDate).day
