@@ -19,8 +19,8 @@ struct ContentView: View {
     
     var body: some View {
         ZStack {
-            // Dynamic background color
-            backgroundColor
+            // Dark background
+            Color(red: 0.11, green: 0.11, blue: 0.12) // #1C1C1E
                 .ignoresSafeArea()
             
             VStack(spacing: 0) {
@@ -28,81 +28,129 @@ struct ContentView: View {
                 VStack(spacing: 8) {
                     Text(currentDateString)
                         .font(.headline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.white.opacity(0.6))
                     
                     Text("Cashin'")
                         .font(.title2)
                         .fontWeight(.bold)
+                        .foregroundStyle(.white)
                 }
                 .padding(.top, 20)
                 
-                // MARK: - Balance Display
+                // MARK: - Balance Display (Card)
                 VStack(spacing: 4) {
                     Text(formattedBalance)
                         .font(.system(size: 72, weight: .bold, design: .rounded))
                         .contentTransition(.numericText())
                         .animation(.spring(response: 0.3), value: dailyBalance)
+                        .foregroundStyle(dailyBalance >= 0 ? cashAppGreen : Color.red)
                         .accessibilityLabel("Daily balance: \(formattedBalance)")
                     
                     Text("Today's Balance")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.white.opacity(0.6))
                 }
+                .frame(maxWidth: .infinity)
                 .padding(.vertical, 40)
+                .background(
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(Color(red: 0.15, green: 0.15, blue: 0.16))
+                        .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
+                )
+                .padding(.horizontal, 20)
+                .padding(.top, 12)
                 
-                // MARK: - Quick Add Buttons
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
-                        QuickAddButton(amount: 5, type: .income)
-                        QuickAddButton(amount: 10, type: .income)
-                        QuickAddButton(amount: 20, type: .income)
-                        QuickAddButton(amount: 5, type: .expense)
-                        QuickAddButton(amount: 10, type: .expense)
-                        QuickAddButton(amount: 20, type: .expense)
-                    }
-                    .padding(.horizontal)
+                // MARK: - Quick Add Buttons (Grid)
+                LazyVGrid(columns: [
+                    GridItem(.flexible(), spacing: 12),
+                    GridItem(.flexible(), spacing: 12),
+                    GridItem(.flexible(), spacing: 12)
+                ], spacing: 12) {
+                    QuickAddButton(amount: 5, type: .income)
+                    QuickAddButton(amount: 10, type: .income)
+                    QuickAddButton(amount: 20, type: .income)
+                    QuickAddButton(amount: 5, type: .expense)
+                    QuickAddButton(amount: 10, type: .expense)
+                    QuickAddButton(amount: 20, type: .expense)
                 }
-                .padding(.vertical, 12)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 20)
                 
-                // MARK: - Transactions List
-                List {
-                    ForEach(todayTransactions) { transaction in
-                        TransactionRow(transaction: transaction)
+                // MARK: - Transactions List (Card)
+                VStack(spacing: 0) {
+                    if todayTransactions.isEmpty {
+                        Text("No transactions today")
+                            .foregroundStyle(.white.opacity(0.4))
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .padding(.vertical, 40)
+                    } else {
+                        ScrollView {
+                            VStack(spacing: 0) {
+                                ForEach(todayTransactions) { transaction in
+                                    TransactionRow(transaction: transaction)
+                                        .swipeActions(edge: .trailing) {
+                                            Button(role: .destructive) {
+                                                modelContext.delete(transaction)
+                                                try? modelContext.save()
+                                            } label: {
+                                                Label("Delete", systemImage: "trash")
+                                            }
+                                        }
+                                        .listRowBackground(Color.clear)
+                                }
+                            }
+                            .padding(.vertical, 8)
+                        }
                     }
-                    .onDelete(perform: deleteTransactions)
                 }
-                .listStyle(.plain)
-                .scrollContentBackground(.hidden)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(Color(red: 0.15, green: 0.15, blue: 0.16))
+                        .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
+                )
+                .padding(.horizontal, 20)
+                .padding(.top, 8)
                 
                 // MARK: - Bottom Action Bar
                 HStack(spacing: 16) {
                     Button(action: { showingHistory = true }) {
-                        HStack {
+                        HStack(spacing: 8) {
                             Image(systemName: "chart.bar.fill")
+                                .font(.system(size: 20))
                             Text("History")
+                                .fontWeight(.semibold)
                         }
                         .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color(.systemGray6))
-                        .cornerRadius(12)
+                        .padding(.vertical, 18)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color(red: 0.15, green: 0.15, blue: 0.16))
+                        )
                     }
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(.white)
                     .accessibilityLabel("View history")
                     
                     Button(action: { showingAddTransaction = true }) {
-                        HStack {
+                        HStack(spacing: 8) {
                             Image(systemName: "plus.circle.fill")
+                                .font(.system(size: 24))
                             Text("Add Entry")
+                                .fontWeight(.bold)
                         }
                         .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue)
-                        .cornerRadius(12)
+                        .padding(.vertical, 18)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(cashAppGreen)
+                                .shadow(color: cashAppGreen.opacity(0.4), radius: 8, x: 0, y: 4)
+                        )
                     }
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.black)
                     .accessibilityLabel("Add new transaction")
                 }
-                .padding()
+                .padding(.horizontal, 20)
+                .padding(.vertical, 16)
             }
         }
         .sheet(isPresented: $showingAddTransaction) {
@@ -118,6 +166,10 @@ struct ContentView: View {
     }
     
     // MARK: - Helper Properties
+    
+    private var cashAppGreen: Color {
+        Color(red: 0.0, green: 0.84, blue: 0.2) // #00D632
+    }
     
     private var todayTransactions: [Transaction] {
         transactions
@@ -144,15 +196,7 @@ struct ContentView: View {
         return sign + (formatter.string(from: NSNumber(value: dailyBalance)) ?? "$0.00")
     }
     
-    private var backgroundColor: Color {
-        if dailyBalance > 0 {
-            return Color.green.opacity(0.1)
-        } else if dailyBalance < 0 {
-            return Color.red.opacity(0.1)
-        } else {
-            return Color(.systemBackground)
-        }
-    }
+
     
     private var currentDateString: String {
         let formatter = DateFormatter()
@@ -161,14 +205,6 @@ struct ContentView: View {
     }
     
     // MARK: - Actions
-    
-    private func deleteTransactions(at offsets: IndexSet) {
-        for index in offsets {
-            let transaction = todayTransactions[index]
-            modelContext.delete(transaction)
-        }
-        try? modelContext.save()
-    }
     
     private func performDayReset() {
         DayResetManager.performResetIfNeeded(
