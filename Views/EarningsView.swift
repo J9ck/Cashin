@@ -91,7 +91,7 @@ struct EarningsView: View {
                                     .padding(.horizontal, 20)
                                 
                                 VStack(spacing: 8) {
-                                    ForEach(categoryData.sorted(by: { $0.value > $1.value }), id: \.key) { category, amount in
+                                    ForEach(sortedCategoryData, id: \.key) { category, amount in
                                         HStack {
                                             Text(category)
                                                 .font(.subheadline)
@@ -221,6 +221,10 @@ struct EarningsView: View {
         }
         
         return EarningsManager.getEarningsByCategory(transactions: filteredTransactions)
+    }
+    
+    private var sortedCategoryData: [(key: String, value: Double)] {
+        categoryData.sorted { $0.value > $1.value }
     }
     
     // MARK: - Helper Methods

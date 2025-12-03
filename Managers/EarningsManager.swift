@@ -56,11 +56,29 @@ class EarningsManager {
         let now = Date()
         
         guard let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: now)),
-              let endOfMonth = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: startOfMonth) else {
+              let endOfMonth = calendar.date(byAdding: .month, value: 1, to: startOfMonth) else {
             return (0.0, 0.0, 0.0)
         }
         
-        return calculateEarnings(from: startOfMonth, to: endOfMonth, transactions: transactions)
+        // Filter transactions within the current month
+        let filteredTransactions = transactions.filter { transaction in
+            transaction.date >= startOfMonth && transaction.date < endOfMonth
+        }
+        
+        var totalIncome = 0.0
+        var totalExpense = 0.0
+        
+        for transaction in filteredTransactions {
+            switch transaction.type {
+            case .income:
+                totalIncome += transaction.amount
+            case .expense:
+                totalExpense += transaction.amount
+            }
+        }
+        
+        let netEarnings = totalIncome - totalExpense
+        return (totalIncome, totalExpense, netEarnings)
     }
     
     /// Save or update earnings record in the database

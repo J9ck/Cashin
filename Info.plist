@@ -12,16 +12,6 @@
 	<string>1</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>17.0</string>
-	<key>NSCameraUsageDescription</key>
-	<string>Cashin&apos; needs access to your camera to capture receipts and transaction records for better expense tracking.</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Cashin&apos; needs permission to save receipt images to your photo library.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Cashin&apos; needs access to your photo library to attach receipt images to transactions.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Cashin&apos; uses your location to automatically categorize transactions and provide location-based insights.</string>
-	<key>NSCalendarsUsageDescription</key>
-	<string>Cashin&apos; needs calendar access to help schedule financial events and reminders.</string>
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>Cashin&apos; sends daily reminders to help you track your spending.</string>
 	<key>UIApplicationSceneManifest</key>

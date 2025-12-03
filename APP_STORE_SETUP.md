@@ -39,15 +39,15 @@ The app requests the following permissions (configured in Info.plist):
 - **NSUserNotificationsUsageDescription**: For daily spending reminders
   - Current: "Cashin' sends daily reminders to help you track your spending."
 
-### Optional Permissions
-These are included for future features:
-- **NSCameraUsageDescription**: For capturing receipts
-- **NSPhotoLibraryAddUsageDescription**: For saving receipt images
-- **NSPhotoLibraryUsageDescription**: For attaching receipt images to transactions
-- **NSLocationWhenInUseUsageDescription**: For location-based transaction insights
-- **NSCalendarsUsageDescription**: For scheduling financial events
+### Optional Permissions (Not Currently Included)
+The following permissions can be added when implementing future features:
+- **NSCameraUsageDescription**: For capturing receipts (when receipt scanning feature is added)
+- **NSPhotoLibraryAddUsageDescription**: For saving receipt images (when receipt feature is added)
+- **NSPhotoLibraryUsageDescription**: For attaching receipt images to transactions (when receipt feature is added)
+- **NSLocationWhenInUseUsageDescription**: For location-based transaction insights (when location feature is added)
+- **NSCalendarsUsageDescription**: For scheduling financial events (when calendar integration is added)
 
-**Action Required**: Review these permissions and remove any that you don't plan to implement. Apple may reject apps that request unnecessary permissions.
+**Important**: Only request permissions that your app actually uses. Apple may reject apps that request unnecessary permissions. Add these descriptions only when you implement the corresponding features.
 
 ## 3. App Icons and Assets
 
