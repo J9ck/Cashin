@@ -43,7 +43,7 @@ struct QuickAddButton: View {
         generator.impactOccurred()
         
         // Create and insert transaction
-        let category = type == .income ? "Other" : "Other"
+        let category = "Other"
         let transaction = Transaction(
             amount: amount,
             category: category,
