@@ -7,10 +7,17 @@ on:
     branches: [ main, develop ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build-and-test:
     name: Build and Test
     runs-on: macos-latest
+    
+    permissions:
+      contents: read
+      actions: read
     
     steps:
     - name: Checkout code
@@ -79,6 +86,9 @@ jobs:
   lint:
     name: SwiftLint
     runs-on: macos-latest
+    
+    permissions:
+      contents: read
     
     steps:
     - name: Checkout code
