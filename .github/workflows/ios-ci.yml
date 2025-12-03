@@ -105,4 +105,3 @@ jobs:
           echo "SwiftLint configuration not found - running with default rules"
           swiftlint lint
         fi
-      continue-on-error: true

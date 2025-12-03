@@ -83,7 +83,7 @@ custom_rules:
   # Ensure proper spacing after MARK comments
   mark_spacing:
     name: "MARK Spacing"
-    regex: '\/\/ MARK: -\S'
+    regex: '\/\/ MARK: -[^ ]'
     message: "MARK comments should have a space after the dash (// MARK: - Text)"
     severity: warning
 
