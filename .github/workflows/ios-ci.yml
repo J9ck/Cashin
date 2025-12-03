@@ -1,0 +1,97 @@
+name: iOS CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: latest-stable
+    
+    - name: Show Xcode version
+      run: xcodebuild -version
+    
+    - name: Show available simulators
+      run: xcrun simctl list devices available
+    
+    - name: Cache Swift Package Manager
+      uses: actions/cache@v3
+      with:
+        path: .build
+        key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+        restore-keys: |
+          ${{ runner.os }}-spm-
+    
+    # Note: This workflow assumes an Xcode project/workspace exists
+    # If the project structure changes, update the build/test commands accordingly
+    
+    - name: Build project
+      run: |
+        echo "Build step placeholder - project structure requires Xcode project setup"
+        echo "To enable building:"
+        echo "1. Create an Xcode project from these source files"
+        echo "2. Update this workflow with the correct scheme and workspace/project path"
+        # Example command when project is set up:
+        # xcodebuild clean build -project Cashin.xcodeproj -scheme Cashin -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.0'
+      
+    - name: Run unit tests
+      run: |
+        echo "Unit tests placeholder - project structure requires Xcode project setup"
+        echo "To enable testing:"
+        echo "1. Create unit tests in CashinTests folder"
+        echo "2. Update this workflow with the correct test scheme"
+        # Example command when tests are set up:
+        # xcodebuild test -project Cashin.xcodeproj -scheme Cashin -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.0'
+    
+    - name: Run UI tests
+      run: |
+        echo "UI tests placeholder - project structure requires Xcode project setup"
+        echo "To enable UI testing:"
+        echo "1. Create UI tests in CashinUITests folder"
+        echo "2. Update this workflow with the correct test scheme"
+        # Example command when UI tests are set up:
+        # xcodebuild test -project Cashin.xcodeproj -scheme Cashin -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.0' -only-testing:CashinUITests
+    
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: |
+          **/*.xcresult
+        retention-days: 30
+        if-no-files-found: ignore
+
+  lint:
+    name: SwiftLint
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install SwiftLint
+      run: brew install swiftlint
+      
+    - name: Run SwiftLint
+      run: |
+        if [ -f .swiftlint.yml ]; then
+          swiftlint lint --strict
+        else
+          echo "SwiftLint configuration not found - running with default rules"
+          swiftlint lint
+        fi
+      continue-on-error: true
