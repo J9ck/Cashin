@@ -10,30 +10,43 @@ import SwiftUI
 struct TransactionRow: View {
     let transaction: Transaction
     
+    private var cashAppGreen: Color {
+        Color(red: 0.0, green: 0.84, blue: 0.2) // #00D632
+    }
+    
     var body: some View {
-        HStack {
-            // Arrow icon
-            Image(systemName: transaction.type == .income ? "arrow.up.circle.fill" : "arrow.down.circle.fill")
-                .foregroundStyle(transaction.type == .income ? .green : .red)
-                .font(.title2)
-                .accessibilityLabel(transaction.type == .income ? "Income" : "Expense")
+        HStack(spacing: 16) {
+            // Arrow icon in circular background
+            ZStack {
+                Circle()
+                    .fill(transaction.type == .income ? cashAppGreen.opacity(0.2) : Color.red.opacity(0.2))
+                    .frame(width: 44, height: 44)
+                
+                Image(systemName: transaction.type == .income ? "arrow.up" : "arrow.down")
+                    .foregroundStyle(transaction.type == .income ? cashAppGreen : Color.red)
+                    .font(.system(size: 18, weight: .bold))
+            }
+            .accessibilityLabel(transaction.type == .income ? "Income" : "Expense")
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(transaction.category)
                     .font(.headline)
+                    .foregroundStyle(.white)
                 
                 Text(formattedTime)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.white.opacity(0.5))
             }
             
             Spacer()
             
             Text(formattedAmount)
-                .font(.headline)
-                .foregroundStyle(transaction.type == .income ? .green : .red)
+                .font(.system(size: 18, weight: .bold))
+                .foregroundStyle(transaction.type == .income ? cashAppGreen : Color.red)
         }
-        .padding(.vertical, 4)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(Color.clear)
     }
     
     // MARK: - Helper Properties

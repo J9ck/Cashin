@@ -13,17 +13,29 @@ struct QuickAddButton: View {
     let type: TransactionType
     @Environment(\.modelContext) private var modelContext
     
+    private var cashAppGreen: Color {
+        Color(red: 0.0, green: 0.84, blue: 0.2) // #00D632
+    }
+    
     var body: some View {
         Button(action: addTransaction) {
-            Text(formattedAmount)
-                .font(.headline)
-                .foregroundStyle(type == .income ? .green : .red)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 10)
-                .background(
-                    Capsule()
-                        .fill(type == .income ? Color.green.opacity(0.1) : Color.red.opacity(0.1))
-                )
+            VStack(spacing: 8) {
+                Image(systemName: type == .income ? "arrow.up.circle.fill" : "arrow.down.circle.fill")
+                    .font(.system(size: 32))
+                    .foregroundStyle(type == .income ? cashAppGreen : Color.red)
+                
+                Text(formattedAmount)
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.white)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 100)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color(red: 0.15, green: 0.15, blue: 0.16))
+                    .shadow(color: .black.opacity(0.3), radius: 5, x: 0, y: 3)
+            )
         }
         .accessibilityLabel("Quick add \(formattedAmount)")
     }
