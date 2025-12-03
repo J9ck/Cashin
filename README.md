@@ -9,6 +9,7 @@ Cashin' is a SwiftUI-based iOS app that helps you track your daily financial bal
 - 🎨 **Dynamic Theming**: Background color changes based on balance (green for positive, red for negative)
 - ⚡ **Quick Add Buttons**: Instantly add common income/expense amounts
 - 📝 **Custom Entries**: Add detailed transactions with categories
+- 💰 **Earnings Tracking**: Track income and expenses over time with detailed analytics
 - 📈 **7-Day History**: View analytics with charts and daily breakdowns
 - 🔔 **Daily Reminders**: Smart notifications at 8 PM based on your balance
 - ♻️ **Automatic Reset**: Daily reset with historical data archiving
@@ -29,22 +30,28 @@ Cashin/
 │   ├── Transaction.swift              # Transaction @Model
 │   ├── DailySummary.swift             # DailySummary @Model  
 │   ├── AppSettings.swift              # AppSettings @Model
+│   ├── Earnings.swift                 # Earnings tracking @Model
 │   └── TransactionType.swift          # TransactionType enum
 ├── Views/
 │   ├── ContentView.swift              # Main dashboard
 │   ├── AddTransactionView.swift       # Add entry sheet
 │   ├── HistoryView.swift              # Analytics/chart view
+│   ├── EarningsView.swift             # Earnings tracking view
 │   └── Components/
 │       ├── QuickAddButton.swift       # Reusable quick add button
 │       └── TransactionRow.swift       # Transaction list row
 ├── Managers/
 │   ├── NotificationManager.swift      # Notification scheduling
-│   └── DayResetManager.swift          # Smart day reset logic
+│   ├── DayResetManager.swift          # Smart day reset logic
+│   ├── EarningsManager.swift          # Earnings calculations
+│   └── AnalyticsManager.swift         # App analytics tracking
 ├── Extensions/
 │   └── Date+Extensions.swift          # Date helper extensions
 ├── Resources/
 │   └── Assets.xcassets/               # App icons, colors
-└── Info.plist                         # Configuration & permissions
+├── Info.plist                         # Configuration & permissions
+├── Cashin.entitlements                # App capabilities
+└── APP_STORE_SETUP.md                 # App Store deployment guide
 ```
 
 ## Getting Started
@@ -75,6 +82,18 @@ Since this is a Swift Package Manager or standalone Swift files project, to buil
 ### Running on Device
 Make sure to configure signing in Xcode with your Apple Developer account.
 
+## App Store Deployment
+
+For detailed instructions on preparing the app for App Store submission, including:
+- Code signing and provisioning profiles
+- App Store Connect configuration
+- Privacy policy requirements
+- Analytics setup (Firebase or Apple Analytics)
+- Build and archive process
+- Review guidelines compliance
+
+Please refer to [APP_STORE_SETUP.md](APP_STORE_SETUP.md)
+
 ## Usage
 
 ### Main Dashboard
@@ -90,6 +109,12 @@ Make sure to configure signing in Xcode with your Apple Developer account.
 3. Enter the amount
 4. Choose a category
 5. Tap "Save"
+
+### Viewing Earnings
+1. Tap "Earnings" on the main dashboard
+2. View your net earnings for different periods (Week/Month/Lifetime)
+3. See income vs expenses breakdown
+4. Analyze earnings by category
 
 ### Categories
 **Income**: Work, Freelance, Gifts, Bonus, Other

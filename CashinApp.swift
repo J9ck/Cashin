@@ -14,6 +14,6 @@ struct CashinApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(for: [Transaction.self, DailySummary.self, AppSettings.self])
+        .modelContainer(for: [Transaction.self, DailySummary.self, AppSettings.self, Earnings.self])
     }
 }
