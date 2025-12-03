@@ -27,35 +27,44 @@ jobs:
     - name: Show available simulators
       run: xcrun simctl list devices available
     
-    # Note: This workflow assumes an Xcode project/workspace exists
-    # If the project structure changes, update the build/test commands accordingly
+    # IMPORTANT: This project currently consists of standalone Swift source files without an Xcode project.
+    # To enable automated building and testing, an Xcode project must be created first.
+    # The commands below are placeholders that document what needs to be configured once a project exists.
+    # Until then, the workflow will run successfully but skip actual build/test steps.
     
     - name: Build project
       run: |
-        echo "Build step placeholder - project structure requires Xcode project setup"
+        echo "⚠️ Build step placeholder - Xcode project setup required"
+        echo ""
+        echo "Current Status: This repository contains Swift source files but no .xcodeproj"
+        echo ""
         echo "To enable building:"
-        echo "1. Create an Xcode project from these source files"
-        echo "2. Update this workflow with the correct scheme and workspace/project path"
-        # Example command when project is set up:
-        # xcodebuild clean build -project Cashin.xcodeproj -scheme Cashin -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.0'
+        echo "1. Create an Xcode project: File → New → Project → iOS App"
+        echo "2. Add all Swift files from this repository to the project"
+        echo "3. Configure project settings (Bundle ID, Deployment Target, etc.)"
+        echo "4. Update this workflow with: xcodebuild clean build -project Cashin.xcodeproj -scheme Cashin -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.0'"
       
     - name: Run unit tests
       run: |
-        echo "Unit tests placeholder - project structure requires Xcode project setup"
+        echo "⚠️ Unit tests placeholder - Xcode project setup required"
+        echo ""
+        echo "Current Status: Unit test files exist in Tests/CashinTests/"
+        echo ""
         echo "To enable testing:"
-        echo "1. Create unit tests in CashinTests folder"
-        echo "2. Update this workflow with the correct test scheme"
-        # Example command when tests are set up:
-        # xcodebuild test -project Cashin.xcodeproj -scheme Cashin -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.0'
+        echo "1. Create an Xcode project and add source files"
+        echo "2. Add test files to a unit test target"
+        echo "3. Update this workflow with: xcodebuild test -project Cashin.xcodeproj -scheme Cashin -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.0'"
     
     - name: Run UI tests
       run: |
-        echo "UI tests placeholder - project structure requires Xcode project setup"
+        echo "⚠️ UI tests placeholder - Xcode project setup required"
+        echo ""
+        echo "Current Status: UI test files exist in Tests/CashinUITests/"
+        echo ""
         echo "To enable UI testing:"
-        echo "1. Create UI tests in CashinUITests folder"
-        echo "2. Update this workflow with the correct test scheme"
-        # Example command when UI tests are set up:
-        # xcodebuild test -project Cashin.xcodeproj -scheme Cashin -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.0' -only-testing:CashinUITests
+        echo "1. Create an Xcode project and add source files"
+        echo "2. Add UI test files to a UI test target"
+        echo "3. Update this workflow with: xcodebuild test -project Cashin.xcodeproj -scheme Cashin -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.0' -only-testing:CashinUITests"
     
     - name: Upload test results
       if: always()
