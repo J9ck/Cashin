@@ -75,7 +75,7 @@ Since this is a Swift Package Manager or standalone Swift files project, to buil
    - Ensure the project settings match:
      - Deployment Target: iOS 17.0
      - Bundle Identifier: com.yourcompany.cashin
-     - Display Name: Cashin'
+     - Display Name: Cashin
 
 3. Build and run on simulator or device
 
