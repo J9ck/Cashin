@@ -22,6 +22,8 @@ struct ContentView: View {
     @State private var showingSettings = false
     @State private var showingAchievements = false
     @State private var showingSavingsGoals = false
+    @State private var showingTrends = false
+    @State private var showingInsights = false
     @State private var isRefreshing = false
     @State private var showConfetti = false
     @State private var showParticleEffect = false
@@ -160,7 +162,44 @@ struct ContentView: View {
                 
                 // MARK: - Bottom Action Bar
                 VStack(spacing: 12) {
-                    // Top row - Quick access buttons
+                    // Top row - Analytics buttons
+                    HStack(spacing: 12) {
+                        Button(action: { showingTrends = true }) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "chart.line.uptrend.xyaxis")
+                                    .font(.system(size: 16))
+                                Text("Trends")
+                                    .font(.caption)
+                                    .fontWeight(.semibold)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color(red: 0.15, green: 0.15, blue: 0.16))
+                            )
+                        }
+                        .foregroundStyle(.white)
+                        
+                        Button(action: { showingInsights = true }) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "lightbulb.fill")
+                                    .font(.system(size: 16))
+                                Text("Insights")
+                                    .font(.caption)
+                                    .fontWeight(.semibold)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color(red: 0.15, green: 0.15, blue: 0.16))
+                            )
+                        }
+                        .foregroundStyle(.white)
+                    }
+                    
+                    // Middle row - Gamification buttons
                     HStack(spacing: 12) {
                         Button(action: { showingAchievements = true }) {
                             HStack(spacing: 6) {
@@ -300,6 +339,12 @@ struct ContentView: View {
         }
         .sheet(isPresented: $showingSavingsGoals) {
             SavingsGoalsView()
+        }
+        .sheet(isPresented: $showingTrends) {
+            TrendsView()
+        }
+        .sheet(isPresented: $showingInsights) {
+            InsightsView()
         }
         .preferredColorScheme(preferredColorScheme)
         .onAppear {
