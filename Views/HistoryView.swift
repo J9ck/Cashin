@@ -60,61 +60,6 @@ struct HistoryView: View {
                         .padding(.horizontal)
                     }
                     
-                    // MARK: - Pie Chart - Expense Breakdown
-                    if !expenseByCategory.isEmpty {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Expense Breakdown")
-                                .font(.headline)
-                                .foregroundStyle(.secondary)
-                                .padding(.horizontal)
-                            
-                            Chart(expenseByCategory) { item in
-                                SectorMark(
-                                    angle: .value("Amount", item.amount),
-                                    innerRadius: .ratio(0.5),
-                                    angularInset: 2
-                                )
-                                .foregroundStyle(by: .value("Category", item.category))
-                                .annotation(position: .overlay) {
-                                    if item.percentage > 10 {
-                                        Text("\(Int(item.percentage))%")
-                                            .font(.caption)
-                                            .fontWeight(.bold)
-                                            .foregroundStyle(.white)
-                                    }
-                                }
-                            }
-                            .frame(height: 250)
-                            .padding()
-                            
-                            // Legend
-                            VStack(alignment: .leading, spacing: 8) {
-                                ForEach(expenseByCategory) { item in
-                                    HStack {
-                                        Circle()
-                                            .fill(categoryColor(item.category))
-                                            .frame(width: 12, height: 12)
-                                        
-                                        Text(item.category)
-                                            .font(.subheadline)
-                                        
-                                        Spacer()
-                                        
-                                        Text(formatCurrency(item.amount))
-                                            .font(.subheadline)
-                                            .fontWeight(.semibold)
-                                            .foregroundStyle(.secondary)
-                                    }
-                                }
-                            }
-                            .padding()
-                        }
-                        .background(Color(.systemBackground))
-                        .cornerRadius(12)
-                        .shadow(radius: 2)
-                        .padding(.horizontal)
-                    }
-                    
                     // MARK: - Daily Breakdown
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Daily Breakdown")
@@ -204,45 +149,6 @@ struct HistoryView: View {
         let net: Double
         let dayLabel: String
         let fullDate: String
-    }
-    
-    private struct CategoryExpenseItem: Identifiable {
-        let id = UUID()
-        let category: String
-        let amount: Double
-        let percentage: Double
-    }
-    
-    private var expenseByCategory: [CategoryExpenseItem] {
-        // Get last 7 days of expenses
-        let sevenDaysAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date()) ?? Date()
-        
-        let expenses = transactions
-            .filter { $0.type == .expense && $0.date >= sevenDaysAgo }
-        
-        guard !expenses.isEmpty else { return [] }
-        
-        // Group by category
-        var categoryTotals: [String: Double] = [:]
-        for expense in expenses {
-            categoryTotals[expense.category, default: 0] += expense.amount
-        }
-        
-        let totalExpenses = categoryTotals.values.reduce(0, +)
-        
-        return categoryTotals.map { category, amount in
-            CategoryExpenseItem(
-                category: category,
-                amount: amount,
-                percentage: (amount / totalExpenses) * 100
-            )
-        }.sorted { $0.amount > $1.amount }
-    }
-    
-    private func categoryColor(_ category: String) -> Color {
-        let colors: [Color] = [.blue, .purple, .pink, .orange, .yellow, .cyan, .mint, .indigo]
-        let index = abs(category.hashValue) % colors.count
-        return colors[index]
     }
     
     private var chartData: [ChartDataItem] {
