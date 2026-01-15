@@ -16,6 +16,7 @@ struct AddTransactionView: View {
     @State private var amount: String = ""
     @State private var selectedCategory: String = "Coffee"
     @State private var flipRotation: Double = 0
+    @State private var note: String = ""
     
     private let incomeCategories = ["Work", "Freelance", "Gifts", "Bonus", "Other"]
     private let expenseCategories = ["Coffee", "Groceries", "Food", "Transport", "Entertainment", "Shopping"]
@@ -73,6 +74,13 @@ struct AddTransactionView: View {
                     .pickerStyle(.wheel)
                     .accessibilityLabel("Transaction category")
                 }
+                
+                // MARK: - Note Field
+                Section("Note (Optional)") {
+                    TextField("Add a note...", text: $note, axis: .vertical)
+                        .lineLimit(3...6)
+                        .accessibilityLabel("Transaction note")
+                }
             }
             .navigationTitle("Add Entry")
             .navigationBarTitleDisplayMode(.inline)
@@ -125,7 +133,8 @@ struct AddTransactionView: View {
             amount: amountValue,
             category: selectedCategory,
             type: selectedType,
-            date: Date()
+            date: Date(),
+            note: note.isEmpty ? nil : note
         )
         
         modelContext.insert(transaction)
