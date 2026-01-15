@@ -161,6 +161,8 @@ struct TrendsView: View {
             } else {
                 // Use summary if available
                 if let summary = summaries.first(where: { $0.date.isSameDay(as: startOfDay) }) {
+                    // For historical data, we only have totalNet in summaries
+                    // Note: Income/Expense views will show net for historical days
                     value = summary.totalNet
                 }
             }

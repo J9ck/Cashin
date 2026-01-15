@@ -74,10 +74,16 @@ struct SettingsView: View {
                 // MARK: - Data Management
                 Section("Data") {
                     Button(role: .destructive) {
-                        // TODO: Implement reset
+                        // TODO: Implement reset functionality in future update
+                        // This will reset all transactions, summaries, and settings
                     } label: {
                         Text("Reset All Data")
                     }
+                    .disabled(true) // Disabled until implementation complete
+                    
+                    Text("Data reset feature coming in future update")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
             }
             .navigationTitle("Settings")

@@ -311,7 +311,7 @@ struct ContentView: View {
                             Text("Undo")
                         }
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                         .padding()
                         .background(Color.blue)
                         .cornerRadius(12)

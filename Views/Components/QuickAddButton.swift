@@ -11,7 +11,7 @@ import SwiftData
 struct QuickAddButton: View {
     let amount: Double
     let type: TransactionType
-    var onTransactionAdded: ((UUID) -> Void)? = nil
+    var onTransactionAdded: ((UUID) -> Void)?
     @Environment(\.modelContext) private var modelContext
     
     private var cashAppGreen: Color {

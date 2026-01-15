@@ -147,7 +147,9 @@ struct InsightsView: View {
             guard let date = calendar.date(byAdding: .day, value: -dayOffset, to: Date()) else { continue }
             let startOfDay = date.startOfDay
             
-            let dayTransactions = transactions.filter { $0.date >= startOfDay && $0.date < startOfDay.addingTimeInterval(86400) }
+            let dayTransactions = transactions.filter { 
+                calendar.isDate($0.date, inSameDayAs: date)
+            }
             
             let dayNet = dayTransactions.reduce(0.0) { sum, transaction in
                 switch transaction.type {
