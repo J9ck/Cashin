@@ -17,6 +17,13 @@ struct ContentView: View {
     @State private var showingAddTransaction = false
     @State private var showingHistory = false
     @State private var showingEarnings = false
+    @State private var isRefreshing = false
+    @State private var showConfetti = false
+    @State private var showParticleEffect = false
+    @State private var particleIsPositive = true
+    @State private var previousBalance: Double = 0
+    @State private var showUndoButton = false
+    @State private var undoTimer: Timer?
     
     var body: some View {
         ZStack {
@@ -39,27 +46,35 @@ struct ContentView: View {
                 .padding(.top, 20)
                 
                 // MARK: - Balance Display (Card)
-                VStack(spacing: 4) {
-                    Text(formattedBalance)
-                        .font(.system(size: 72, weight: .bold, design: .rounded))
-                        .contentTransition(.numericText())
-                        .animation(.spring(response: 0.3), value: dailyBalance)
-                        .foregroundStyle(dailyBalance >= 0 ? cashAppGreen : Color.red)
-                        .accessibilityLabel("Daily balance: \(formattedBalance)")
+                ZStack {
+                    VStack(spacing: 4) {
+                        Text(formattedBalance)
+                            .font(.system(size: 72, weight: .bold, design: .rounded))
+                            .contentTransition(.numericText())
+                            .animation(.spring(response: 0.3), value: dailyBalance)
+                            .foregroundStyle(dailyBalance >= 0 ? cashAppGreen : Color.red)
+                            .accessibilityLabel("Daily balance: \(formattedBalance)")
+                        
+                        Text("Today's Balance")
+                            .font(.subheadline)
+                            .foregroundStyle(.white.opacity(0.6))
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 40)
+                    .background(
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(Color(red: 0.15, green: 0.15, blue: 0.16))
+                            .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
+                    )
+                    .padding(.horizontal, 20)
+                    .padding(.top, 12)
                     
-                    Text("Today's Balance")
-                        .font(.subheadline)
-                        .foregroundStyle(.white.opacity(0.6))
+                    // Particle effect overlay
+                    if showParticleEffect {
+                        ParticleEffect(isPositive: particleIsPositive)
+                            .padding(.top, 12)
+                    }
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 40)
-                .background(
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(Color(red: 0.15, green: 0.15, blue: 0.16))
-                        .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
-                )
-                .padding(.horizontal, 20)
-                .padding(.top, 12)
                 
                 // MARK: - Quick Add Buttons (Grid)
                 LazyVGrid(columns: [
@@ -67,12 +82,12 @@ struct ContentView: View {
                     GridItem(.flexible(), spacing: 12),
                     GridItem(.flexible(), spacing: 12)
                 ], spacing: 12) {
-                    QuickAddButton(amount: 5, type: .income)
-                    QuickAddButton(amount: 10, type: .income)
-                    QuickAddButton(amount: 20, type: .income)
-                    QuickAddButton(amount: 5, type: .expense)
-                    QuickAddButton(amount: 10, type: .expense)
-                    QuickAddButton(amount: 20, type: .expense)
+                    QuickAddButton(amount: 5, type: .income, onTransactionAdded: showUndoOption)
+                    QuickAddButton(amount: 10, type: .income, onTransactionAdded: showUndoOption)
+                    QuickAddButton(amount: 20, type: .income, onTransactionAdded: showUndoOption)
+                    QuickAddButton(amount: 5, type: .expense, onTransactionAdded: showUndoOption)
+                    QuickAddButton(amount: 10, type: .expense, onTransactionAdded: showUndoOption)
+                    QuickAddButton(amount: 20, type: .expense, onTransactionAdded: showUndoOption)
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 20)
@@ -91,8 +106,7 @@ struct ContentView: View {
                                     TransactionRow(transaction: transaction)
                                         .swipeActions(edge: .trailing) {
                                             Button(role: .destructive) {
-                                                modelContext.delete(transaction)
-                                                try? modelContext.save()
+                                                deleteTransaction(transaction)
                                             } label: {
                                                 Label("Delete", systemImage: "trash")
                                             }
@@ -101,6 +115,9 @@ struct ContentView: View {
                                 }
                             }
                             .padding(.vertical, 8)
+                        }
+                        .refreshable {
+                            await refreshData()
                         }
                     }
                 }
@@ -170,6 +187,33 @@ struct ContentView: View {
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)
             }
+            
+            // MARK: - Confetti Overlay
+            if showConfetti {
+                ConfettiView()
+                    .ignoresSafeArea()
+            }
+            
+            // MARK: - Undo Button
+            if showUndoButton {
+                VStack {
+                    Spacer()
+                    Button(action: undoLastTransaction) {
+                        HStack {
+                            Image(systemName: "arrow.uturn.backward.circle.fill")
+                            Text("Undo")
+                        }
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(Color.blue)
+                        .cornerRadius(12)
+                        .shadow(radius: 4)
+                    }
+                    .padding(.bottom, 100)
+                }
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
         }
         .sheet(isPresented: $showingAddTransaction) {
             AddTransactionView()
@@ -183,6 +227,10 @@ struct ContentView: View {
         .onAppear {
             performDayReset()
             scheduleNotifications()
+            previousBalance = dailyBalance
+        }
+        .onChange(of: dailyBalance) { oldValue, newValue in
+            handleBalanceChange(from: oldValue, to: newValue)
         }
     }
     
@@ -239,6 +287,107 @@ struct ContentView: View {
     private func scheduleNotifications() {
         NotificationManager.shared.requestAuthorization()
         NotificationManager.shared.scheduleDailyReminder(balance: dailyBalance)
+    }
+    
+    private func deleteTransaction(_ transaction: Transaction) {
+        HapticManager.shared.deleteHaptic()
+        modelContext.delete(transaction)
+        try? modelContext.save()
+    }
+    
+    private func refreshData() async {
+        isRefreshing = true
+        performDayReset()
+        scheduleNotifications()
+        
+        try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 second delay
+        isRefreshing = false
+    }
+    
+    private func handleBalanceChange(from oldValue: Double, to newValue: Double) {
+        // Trigger particle effects
+        if newValue != oldValue && oldValue != 0 {
+            particleIsPositive = newValue > oldValue
+            showParticleEffect = true
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                showParticleEffect = false
+            }
+        }
+        
+        // Check for confetti triggers
+        checkConfettiTriggers(oldBalance: oldValue, newBalance: newValue)
+    }
+    
+    private func checkConfettiTriggers(oldBalance: Double, newBalance: Double) {
+        guard let currentSettings = settings.first else { return }
+        
+        // Trigger when balance goes from negative to positive
+        if oldBalance < 0 && newBalance >= 0 {
+            triggerConfetti()
+            return
+        }
+        
+        // Milestone triggers
+        let milestones: [Double] = [100, 500, 1000]
+        let today = Date().startOfDay.timeIntervalSince1970
+        
+        for milestone in milestones {
+            let milestoneKey = "milestone_\(Int(milestone))_\(Int(today))"
+            if newBalance >= milestone && oldBalance < milestone {
+                if !currentSettings.milestonesReached.contains(milestoneKey) {
+                    currentSettings.milestonesReached.append(milestoneKey)
+                    try? modelContext.save()
+                    triggerConfetti()
+                    break
+                }
+            }
+        }
+    }
+    
+    private func triggerConfetti() {
+        HapticManager.shared.successHaptic()
+        showConfetti = true
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+            showConfetti = false
+        }
+    }
+    
+    private func undoLastTransaction() {
+        guard let currentSettings = settings.first,
+              let lastTransactionID = currentSettings.lastTransactionID,
+              let transaction = transactions.first(where: { $0.id == lastTransactionID }) else {
+            return
+        }
+        
+        HapticManager.shared.warningHaptic()
+        modelContext.delete(transaction)
+        currentSettings.lastTransactionID = nil
+        try? modelContext.save()
+        
+        withAnimation {
+            showUndoButton = false
+        }
+        undoTimer?.invalidate()
+    }
+    
+    private func showUndoOption(for transactionID: UUID) {
+        guard let currentSettings = settings.first else { return }
+        
+        currentSettings.lastTransactionID = transactionID
+        try? modelContext.save()
+        
+        withAnimation {
+            showUndoButton = true
+        }
+        
+        undoTimer?.invalidate()
+        undoTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false) { _ in
+            withAnimation {
+                showUndoButton = false
+            }
+        }
     }
 }
 

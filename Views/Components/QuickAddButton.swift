@@ -11,6 +11,7 @@ import SwiftData
 struct QuickAddButton: View {
     let amount: Double
     let type: TransactionType
+    var onTransactionAdded: ((UUID) -> Void)? = nil
     @Environment(\.modelContext) private var modelContext
     
     private var cashAppGreen: Color {
@@ -51,8 +52,11 @@ struct QuickAddButton: View {
     
     private func addTransaction() {
         // Haptic feedback
-        let generator = UIImpactFeedbackGenerator(style: .medium)
-        generator.impactOccurred()
+        if type == .income {
+            HapticManager.shared.incomeHaptic()
+        } else {
+            HapticManager.shared.expenseHaptic()
+        }
         
         // Create and insert transaction
         let category = "Other"
@@ -65,6 +69,9 @@ struct QuickAddButton: View {
         modelContext.insert(transaction)
         
         try? modelContext.save()
+        
+        // Notify parent about new transaction
+        onTransactionAdded?(transaction.id)
     }
 }
 
