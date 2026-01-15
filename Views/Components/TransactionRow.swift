@@ -33,9 +33,34 @@ struct TransactionRow: View {
                     .font(.headline)
                     .foregroundStyle(.white)
                 
-                Text(formattedTime)
-                    .font(.caption)
-                    .foregroundStyle(.white.opacity(0.5))
+                HStack(spacing: 4) {
+                    Text(formattedTime)
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.5))
+                    
+                    if transaction.note != nil && !(transaction.note?.isEmpty ?? true) {
+                        Text("•")
+                            .font(.caption)
+                            .foregroundStyle(.white.opacity(0.5))
+                        
+                        Image(systemName: "note.text")
+                            .font(.caption)
+                            .foregroundStyle(.white.opacity(0.5))
+                    }
+                    
+                    if transaction.photoData != nil {
+                        Image(systemName: "camera.fill")
+                            .font(.caption)
+                            .foregroundStyle(.white.opacity(0.5))
+                    }
+                }
+                
+                if let note = transaction.note, !note.isEmpty {
+                    Text(note)
+                        .font(.caption2)
+                        .foregroundStyle(.white.opacity(0.4))
+                        .lineLimit(1)
+                }
             }
             
             Spacer()

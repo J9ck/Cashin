@@ -44,6 +44,13 @@ final class DayResetManager {
                 lastSessionDate: settings.lastSessionDate
             )
             
+            // Update streaks
+            updateStreaks(
+                context: context,
+                summaries: summaries,
+                lastSessionDate: settings.lastSessionDate
+            )
+            
             // Update last session date
             settings.lastSessionDate = Date()
             try? context.save()
@@ -83,5 +90,50 @@ final class DayResetManager {
             let summary = DailySummary(date: lastSessionDay, totalNet: totalNet)
             context.insert(summary)
         }
+    }
+    
+    private static func updateStreaks(
+        context: ModelContext,
+        summaries: [DailySummary],
+        lastSessionDate: Date
+    ) {
+        // Fetch or create streak record
+        let descriptor = FetchDescriptor<Streak>()
+        let streaks = (try? context.fetch(descriptor)) ?? []
+        
+        let streak: Streak
+        if let existingStreak = streaks.first {
+            streak = existingStreak
+        } else {
+            streak = Streak()
+            context.insert(streak)
+        }
+        
+        // Get yesterday's summary
+        let lastSessionDay = lastSessionDate.startOfDay
+        let yesterdaySummary = summaries.first { $0.date.isSameDay(as: lastSessionDay) }
+        
+        // Check if yesterday was positive
+        if let summary = yesterdaySummary, summary.totalNet > 0 {
+            // Continue or start streak
+            if let lastPositive = streak.lastPositiveDate,
+               lastPositive.startOfDay == lastSessionDay.addingTimeInterval(-86400) { // Previous day
+                streak.currentStreak += 1
+            } else {
+                streak.currentStreak = 1
+            }
+            
+            streak.lastPositiveDate = lastSessionDay
+            
+            // Update longest streak
+            if streak.currentStreak > streak.longestStreak {
+                streak.longestStreak = streak.currentStreak
+            }
+        } else {
+            // Reset streak
+            streak.currentStreak = 0
+        }
+        
+        try? context.save()
     }
 }

@@ -15,6 +15,8 @@ struct AddTransactionView: View {
     @State private var selectedType: TransactionType = .expense
     @State private var amount: String = ""
     @State private var selectedCategory: String = "Coffee"
+    @State private var flipRotation: Double = 0
+    @State private var note: String = ""
     
     private let incomeCategories = ["Work", "Freelance", "Gifts", "Bonus", "Other"]
     private let expenseCategories = ["Coffee", "Groceries", "Food", "Transport", "Entertainment", "Shopping"]
@@ -32,6 +34,14 @@ struct AddTransactionView: View {
                     .onChange(of: selectedType) { _, newValue in
                         // Reset category when type changes
                         selectedCategory = newValue == .income ? incomeCategories[0] : expenseCategories[0]
+                        
+                        // Haptic feedback
+                        HapticManager.shared.selectionHaptic()
+                        
+                        // Card flip animation
+                        withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                            flipRotation += 180
+                        }
                     }
                 }
                 
@@ -49,6 +59,10 @@ struct AddTransactionView: View {
                             .accessibilityLabel("Transaction amount")
                     }
                 }
+                .rotation3DEffect(
+                    .degrees(flipRotation),
+                    axis: (x: 0, y: 1, z: 0)
+                )
                 
                 // MARK: - Category Picker
                 Section("Category") {
@@ -59,6 +73,13 @@ struct AddTransactionView: View {
                     }
                     .pickerStyle(.wheel)
                     .accessibilityLabel("Transaction category")
+                }
+                
+                // MARK: - Note Field
+                Section("Note (Optional)") {
+                    TextField("Add a note...", text: $note, axis: .vertical)
+                        .lineLimit(3...6)
+                        .accessibilityLabel("Transaction note")
                 }
             }
             .navigationTitle("Add Entry")
@@ -101,16 +122,25 @@ struct AddTransactionView: View {
             return
         }
         
+        // Haptic feedback
+        if selectedType == .income {
+            HapticManager.shared.incomeHaptic()
+        } else {
+            HapticManager.shared.expenseHaptic()
+        }
+        
         let transaction = Transaction(
             amount: amountValue,
             category: selectedCategory,
             type: selectedType,
-            date: Date()
+            date: Date(),
+            note: note.isEmpty ? nil : note
         )
         
         modelContext.insert(transaction)
         try? modelContext.save()
         
+        HapticManager.shared.successHaptic()
         dismiss()
     }
 }
