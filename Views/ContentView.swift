@@ -13,10 +13,15 @@ struct ContentView: View {
     @Query private var transactions: [Transaction]
     @Query private var summaries: [DailySummary]
     @Query private var settings: [AppSettings]
+    @Query private var streaks: [Streak]
+    @Query private var achievements: [Achievement]
     
     @State private var showingAddTransaction = false
     @State private var showingHistory = false
     @State private var showingEarnings = false
+    @State private var showingSettings = false
+    @State private var showingAchievements = false
+    @State private var showingSavingsGoals = false
     @State private var isRefreshing = false
     @State private var showConfetti = false
     @State private var showParticleEffect = false
@@ -33,15 +38,38 @@ struct ContentView: View {
             
             VStack(spacing: 0) {
                 // MARK: - Header
-                VStack(spacing: 8) {
-                    Text(currentDateString)
-                        .font(.headline)
-                        .foregroundStyle(.white.opacity(0.6))
+                HStack {
+                    Spacer()
                     
-                    Text("Cashin'")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.white)
+                    VStack(spacing: 8) {
+                        Text(currentDateString)
+                            .font(.headline)
+                            .foregroundStyle(.white.opacity(0.6))
+                        
+                        Text("Cashin'")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.white)
+                        
+                        // Streak Display
+                        if let streak = streaks.first, streak.currentStreak > 0 {
+                            HStack(spacing: 4) {
+                                Text("🔥")
+                                Text("\(streak.currentStreak) day streak")
+                                    .font(.caption)
+                                    .foregroundStyle(.orange)
+                            }
+                        }
+                    }
+                    
+                    Spacer()
+                    
+                    Button(action: { showingSettings = true }) {
+                        Image(systemName: "gear")
+                            .font(.system(size: 20))
+                            .foregroundStyle(.white.opacity(0.8))
+                    }
+                    .padding(.trailing, 20)
                 }
                 .padding(.top, 20)
                 
@@ -131,61 +159,101 @@ struct ContentView: View {
                 .padding(.top, 8)
                 
                 // MARK: - Bottom Action Bar
-                HStack(spacing: 16) {
-                    Button(action: { showingHistory = true }) {
-                        HStack(spacing: 8) {
-                            Image(systemName: "chart.bar.fill")
-                                .font(.system(size: 20))
-                            Text("History")
-                                .fontWeight(.semibold)
+                VStack(spacing: 12) {
+                    // Top row - Quick access buttons
+                    HStack(spacing: 12) {
+                        Button(action: { showingAchievements = true }) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "trophy.fill")
+                                    .font(.system(size: 16))
+                                Text("Achievements")
+                                    .font(.caption)
+                                    .fontWeight(.semibold)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color(red: 0.15, green: 0.15, blue: 0.16))
+                            )
                         }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 18)
-                        .background(
-                            RoundedRectangle(cornerRadius: 16)
-                                .fill(Color(red: 0.15, green: 0.15, blue: 0.16))
-                        )
+                        .foregroundStyle(.white)
+                        
+                        Button(action: { showingSavingsGoals = true }) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "target")
+                                    .font(.system(size: 16))
+                                Text("Goals")
+                                    .font(.caption)
+                                    .fontWeight(.semibold)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color(red: 0.15, green: 0.15, blue: 0.16))
+                            )
+                        }
+                        .foregroundStyle(.white)
                     }
-                    .foregroundStyle(.white)
-                    .accessibilityLabel("View history")
                     
-                    Button(action: { showingEarnings = true }) {
-                        HStack(spacing: 8) {
-                            Image(systemName: "dollarsign.circle.fill")
-                                .font(.system(size: 20))
-                            Text("Earnings")
-                                .fontWeight(.semibold)
+                    // Bottom row - Main action buttons
+                    HStack(spacing: 12) {
+                        Button(action: { showingHistory = true }) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "chart.bar.fill")
+                                    .font(.system(size: 18))
+                                Text("History")
+                                    .fontWeight(.semibold)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(
+                                RoundedRectangle(cornerRadius: 14)
+                                    .fill(Color(red: 0.15, green: 0.15, blue: 0.16))
+                            )
                         }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 18)
-                        .background(
-                            RoundedRectangle(cornerRadius: 16)
-                                .fill(Color(red: 0.15, green: 0.15, blue: 0.16))
-                        )
-                    }
-                    .foregroundStyle(.white)
-                    .accessibilityLabel("View earnings")
-                    
-                    Button(action: { showingAddTransaction = true }) {
-                        HStack(spacing: 8) {
-                            Image(systemName: "plus.circle.fill")
-                                .font(.system(size: 24))
-                            Text("Add Entry")
-                                .fontWeight(.bold)
+                        .foregroundStyle(.white)
+                        .accessibilityLabel("View history")
+                        
+                        Button(action: { showingEarnings = true }) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "dollarsign.circle.fill")
+                                    .font(.system(size: 18))
+                                Text("Earnings")
+                                    .fontWeight(.semibold)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(
+                                RoundedRectangle(cornerRadius: 14)
+                                    .fill(Color(red: 0.15, green: 0.15, blue: 0.16))
+                            )
                         }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 18)
-                        .background(
-                            RoundedRectangle(cornerRadius: 16)
-                                .fill(cashAppGreen)
-                                .shadow(color: cashAppGreen.opacity(0.4), radius: 8, x: 0, y: 4)
-                        )
+                        .foregroundStyle(.white)
+                        .accessibilityLabel("View earnings")
+                        
+                        Button(action: { showingAddTransaction = true }) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "plus.circle.fill")
+                                    .font(.system(size: 22))
+                                Text("Add")
+                                    .fontWeight(.bold)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(
+                                RoundedRectangle(cornerRadius: 14)
+                                    .fill(cashAppGreen)
+                                    .shadow(color: cashAppGreen.opacity(0.4), radius: 8, x: 0, y: 4)
+                            )
+                        }
+                        .foregroundStyle(.black)
+                        .accessibilityLabel("Add new transaction")
                     }
-                    .foregroundStyle(.black)
-                    .accessibilityLabel("Add new transaction")
                 }
                 .padding(.horizontal, 20)
-                .padding(.vertical, 16)
+                .padding(.vertical, 12)
             }
             
             // MARK: - Confetti Overlay
@@ -224,13 +292,26 @@ struct ContentView: View {
         .sheet(isPresented: $showingEarnings) {
             EarningsView()
         }
+        .sheet(isPresented: $showingSettings) {
+            SettingsView()
+        }
+        .sheet(isPresented: $showingAchievements) {
+            AchievementsView()
+        }
+        .sheet(isPresented: $showingSavingsGoals) {
+            SavingsGoalsView()
+        }
+        .preferredColorScheme(preferredColorScheme)
         .onAppear {
             performDayReset()
             scheduleNotifications()
             previousBalance = dailyBalance
+            initializeAchievements()
+            checkAchievements()
         }
         .onChange(of: dailyBalance) { oldValue, newValue in
             handleBalanceChange(from: oldValue, to: newValue)
+            checkAchievements()
         }
     }
     
@@ -238,6 +319,22 @@ struct ContentView: View {
     
     private var cashAppGreen: Color {
         Color(red: 0.0, green: 0.84, blue: 0.2) // #00D632
+    }
+    
+    private var preferredColorScheme: ColorScheme? {
+        guard let currentSettings = settings.first,
+              let scheme = currentSettings.preferredColorScheme else {
+            return nil // System default
+        }
+        
+        switch scheme {
+        case 1:
+            return .light
+        case 2:
+            return .dark
+        default:
+            return nil // System default
+        }
     }
     
     private var todayTransactions: [Transaction] {
@@ -388,6 +485,25 @@ struct ContentView: View {
                 showUndoButton = false
             }
         }
+    }
+    
+    private func initializeAchievements() {
+        AchievementManager.initializeDefaultAchievements(
+            context: modelContext,
+            achievements: achievements
+        )
+    }
+    
+    private func checkAchievements() {
+        let currentStreak = streaks.first?.currentStreak ?? 0
+        AchievementManager.checkAchievements(
+            context: modelContext,
+            achievements: achievements,
+            transactions: transactions,
+            summaries: summaries,
+            currentBalance: dailyBalance,
+            currentStreak: currentStreak
+        )
     }
 }
 
