@@ -15,27 +15,12 @@ final class Transaction {
     var category: String
     var type: TransactionType
     var date: Date
-    var note: String?
-    var tags: [String]
-    var photoData: Data?
     
-    init(
-        id: UUID = UUID(),
-        amount: Double,
-        category: String,
-        type: TransactionType,
-        date: Date = Date(),
-        note: String? = nil,
-        tags: [String] = [],
-        photoData: Data? = nil
-    ) {
+    init(id: UUID = UUID(), amount: Double, category: String, type: TransactionType, date: Date = Date()) {
         self.id = id
         self.amount = amount
         self.category = category
         self.type = type
         self.date = date
-        self.note = note
-        self.tags = tags
-        self.photoData = photoData
     }
 }
