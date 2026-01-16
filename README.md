@@ -54,7 +54,6 @@ Cashin/
 - iOS 17.0+ Simulator or device
 
 ### Building the Project
-Since this is a Swift Package Manager or standalone Swift files project, to build:
 
 1. Clone the repository:
    ```bash
@@ -62,18 +61,26 @@ Since this is a Swift Package Manager or standalone Swift files project, to buil
    cd Cashin
    ```
 
-2. Open in Xcode:
-   - Create a new iOS App project in Xcode
-   - Replace the default files with the files from this repository
-   - Ensure the project settings match:
-     - Deployment Target: iOS 17.0
-     - Bundle Identifier: com.yourcompany.cashin
-     - Display Name: Cashin'
+2. Open the project in Xcode:
+   ```bash
+   open Cashin.xcodeproj
+   ```
+   Or double-click `Cashin.xcodeproj` in Finder.
 
-3. Build and run on simulator or device
+3. Configure code signing:
+   - Select the project in Xcode
+   - Go to "Signing & Capabilities"
+   - Select your Team in the "Signing" section
+
+4. Build and run:
+   - Select a simulator or connected device
+   - Press ⌘R or click the Run button
 
 ### Running on Device
-Make sure to configure signing in Xcode with your Apple Developer account.
+Make sure to configure signing in Xcode with your Apple Developer account. The project is pre-configured with:
+- Deployment Target: iOS 17.0
+- Bundle Identifier: com.cashin.app
+- Display Name: Cashin'
 
 ## Usage
 
