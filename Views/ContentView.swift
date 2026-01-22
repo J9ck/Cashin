@@ -16,11 +16,16 @@ struct ContentView: View {
     
     @State private var showingAddTransaction = false
     @State private var showingHistory = false
+    @State private var showingEarnings = false
+    
+    // Cash App theme colors
+    private let darkBackground = Color(red: 28/255, green: 28/255, blue: 30/255)
+    private let accentGreen = Color(red: 0/255, green: 214/255, blue: 50/255)
     
     var body: some View {
         ZStack {
-            // Dynamic background color
-            backgroundColor
+            // Dark background
+            darkBackground
                 .ignoresSafeArea()
             
             VStack(spacing: 0) {
@@ -28,46 +33,55 @@ struct ContentView: View {
                 VStack(spacing: 8) {
                     Text(currentDateString)
                         .font(.headline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.white.opacity(0.7))
                     
                     Text("Cashin'")
                         .font(.title2)
                         .fontWeight(.bold)
+                        .foregroundStyle(.white)
                 }
                 .padding(.top, 20)
                 
-                // MARK: - Balance Display
-                VStack(spacing: 4) {
+                // MARK: - Balance Display Card
+                VStack(spacing: 8) {
+                    Text("Today's Balance")
+                        .font(.subheadline)
+                        .foregroundStyle(.white.opacity(0.7))
+                    
                     Text(formattedBalance)
-                        .font(.system(size: 72, weight: .bold, design: .rounded))
+                        .font(.system(size: 64, weight: .bold, design: .rounded))
+                        .foregroundStyle(dailyBalance >= 0 ? accentGreen : .red)
                         .contentTransition(.numericText())
                         .animation(.spring(response: 0.3), value: dailyBalance)
                         .accessibilityLabel("Daily balance: \(formattedBalance)")
-                    
-                    Text("Today's Balance")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
                 }
-                .padding(.vertical, 40)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 32)
+                .background(
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Color.white.opacity(0.05))
+                        .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
+                )
+                .padding(.horizontal)
+                .padding(.vertical, 20)
                 
-                // MARK: - Quick Add Buttons
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
-                        QuickAddButton(amount: 5, type: .income)
-                        QuickAddButton(amount: 10, type: .income)
-                        QuickAddButton(amount: 20, type: .income)
-                        QuickAddButton(amount: 5, type: .expense)
-                        QuickAddButton(amount: 10, type: .expense)
-                        QuickAddButton(amount: 20, type: .expense)
-                    }
-                    .padding(.horizontal)
+                // MARK: - Quick Add Buttons (2x3 Grid)
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                    QuickAddButton(amount: 5, type: .income)
+                    QuickAddButton(amount: 10, type: .income)
+                    QuickAddButton(amount: 20, type: .income)
+                    QuickAddButton(amount: 5, type: .expense)
+                    QuickAddButton(amount: 10, type: .expense)
+                    QuickAddButton(amount: 20, type: .expense)
                 }
+                .padding(.horizontal)
                 .padding(.vertical, 12)
                 
                 // MARK: - Transactions List
                 List {
                     ForEach(todayTransactions) { transaction in
                         TransactionRow(transaction: transaction)
+                            .listRowBackground(Color.clear)
                     }
                     .onDelete(perform: deleteTransactions)
                 }
@@ -75,32 +89,53 @@ struct ContentView: View {
                 .scrollContentBackground(.hidden)
                 
                 // MARK: - Bottom Action Bar
-                HStack(spacing: 16) {
-                    Button(action: { showingHistory = true }) {
-                        HStack {
-                            Image(systemName: "chart.bar.fill")
-                            Text("History")
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color(.systemGray6))
-                        .cornerRadius(12)
-                    }
-                    .foregroundStyle(.primary)
-                    .accessibilityLabel("View history")
-                    
+                VStack(spacing: 12) {
+                    // Large Add Entry Button
                     Button(action: { showingAddTransaction = true }) {
                         HStack {
                             Image(systemName: "plus.circle.fill")
+                                .font(.title2)
                             Text("Add Entry")
+                                .font(.headline)
                         }
                         .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue)
-                        .cornerRadius(12)
+                        .padding(.vertical, 18)
+                        .background(accentGreen)
+                        .cornerRadius(14)
                     }
                     .foregroundStyle(.white)
                     .accessibilityLabel("Add new transaction")
+                    
+                    // Secondary buttons
+                    HStack(spacing: 12) {
+                        Button(action: { showingHistory = true }) {
+                            HStack {
+                                Image(systemName: "chart.bar.fill")
+                                Text("History")
+                            }
+                            .font(.subheadline)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(Color.white.opacity(0.1))
+                            .cornerRadius(10)
+                        }
+                        .foregroundStyle(.white)
+                        .accessibilityLabel("View history")
+                        
+                        Button(action: { showingEarnings = true }) {
+                            HStack {
+                                Image(systemName: "dollarsign.circle.fill")
+                                Text("Earnings")
+                            }
+                            .font(.subheadline)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(Color.white.opacity(0.1))
+                            .cornerRadius(10)
+                        }
+                        .foregroundStyle(.white)
+                        .accessibilityLabel("View earnings")
+                    }
                 }
                 .padding()
             }
@@ -110,6 +145,9 @@ struct ContentView: View {
         }
         .sheet(isPresented: $showingHistory) {
             HistoryView()
+        }
+        .sheet(isPresented: $showingEarnings) {
+            EarningsView()
         }
         .onAppear {
             performDayReset()
@@ -144,15 +182,7 @@ struct ContentView: View {
         return sign + (formatter.string(from: NSNumber(value: dailyBalance)) ?? "$0.00")
     }
     
-    private var backgroundColor: Color {
-        if dailyBalance > 0 {
-            return Color.green.opacity(0.1)
-        } else if dailyBalance < 0 {
-            return Color.red.opacity(0.1)
-        } else {
-            return Color(.systemBackground)
-        }
-    }
+
     
     private var currentDateString: String {
         let formatter = DateFormatter()
@@ -187,5 +217,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .modelContainer(for: [Transaction.self, DailySummary.self, AppSettings.self], inMemory: true)
+        .modelContainer(for: [Transaction.self, DailySummary.self, AppSettings.self, EarningsModel.self], inMemory: true)
 }

@@ -10,28 +10,32 @@ import SwiftUI
 struct TransactionRow: View {
     let transaction: Transaction
     
+    // Cash App theme colors
+    private let accentGreen = Color(red: 0/255, green: 214/255, blue: 50/255)
+    
     var body: some View {
         HStack {
             // Arrow icon
             Image(systemName: transaction.type == .income ? "arrow.up.circle.fill" : "arrow.down.circle.fill")
-                .foregroundStyle(transaction.type == .income ? .green : .red)
+                .foregroundStyle(transaction.type == .income ? accentGreen : .red)
                 .font(.title2)
                 .accessibilityLabel(transaction.type == .income ? "Income" : "Expense")
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(transaction.category)
                     .font(.headline)
+                    .foregroundStyle(.white)
                 
                 Text(formattedTime)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.white.opacity(0.6))
             }
             
             Spacer()
             
             Text(formattedAmount)
                 .font(.headline)
-                .foregroundStyle(transaction.type == .income ? .green : .red)
+                .foregroundStyle(transaction.type == .income ? accentGreen : .red)
         }
         .padding(.vertical, 4)
     }
@@ -51,8 +55,15 @@ struct TransactionRow: View {
 }
 
 #Preview {
-    List {
-        TransactionRow(transaction: Transaction(amount: 25.50, category: "Coffee", type: .expense))
-        TransactionRow(transaction: Transaction(amount: 100.00, category: "Work", type: .income))
+    ZStack {
+        Color(red: 28/255, green: 28/255, blue: 30/255)
+            .ignoresSafeArea()
+        
+        List {
+            TransactionRow(transaction: Transaction(amount: 25.50, category: "Coffee", type: .expense))
+            TransactionRow(transaction: Transaction(amount: 100.00, category: "Work", type: .income))
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
     }
 }
