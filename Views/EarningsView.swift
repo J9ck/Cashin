@@ -177,11 +177,15 @@ struct EarningsView: View {
         return sign + formatCurrency(abs(netEarnings))
     }
     
-    private func formatCurrency(_ amount: Double) -> String {
+    private let currencyFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
         formatter.currencyCode = "USD"
-        return formatter.string(from: NSNumber(value: amount)) ?? "$0.00"
+        return formatter
+    }()
+    
+    private func formatCurrency(_ amount: Double) -> String {
+        currencyFormatter.string(from: NSNumber(value: amount)) ?? "$0.00"
     }
 }
 

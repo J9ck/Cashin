@@ -22,6 +22,9 @@ struct ContentView: View {
     private let darkBackground = Color(red: 28/255, green: 28/255, blue: 30/255)
     private let accentGreen = Color(red: 0/255, green: 214/255, blue: 50/255)
     
+    // Grid layout
+    private let quickAddColumns = Array(repeating: GridItem(.flexible()), count: 3)
+    
     var body: some View {
         ZStack {
             // Dark background
@@ -66,7 +69,7 @@ struct ContentView: View {
                 .padding(.vertical, 20)
                 
                 // MARK: - Quick Add Buttons (2x3 Grid)
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                LazyVGrid(columns: quickAddColumns, spacing: 12) {
                     QuickAddButton(amount: 5, type: .income)
                     QuickAddButton(amount: 10, type: .income)
                     QuickAddButton(amount: 20, type: .income)
